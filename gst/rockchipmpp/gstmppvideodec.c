@@ -185,8 +185,16 @@ static gboolean
 gst_mpp_video_dec_open (GstVideoDecoder * decoder)
 {
   GstMppVideoDec *self = GST_MPP_VIDEO_DEC (decoder);
+
+  gint io_mode = MPP_IO_MODE_SIMPLE;
+
+  mpp_create (&self->mpp_ctx, &self->mpi);
+
   if (mpp_create (&self->mpp_ctx, &self->mpi))
     return FALSE;
+
+  self->mpi->control (self->mpp_ctx, MPP_SET_TRANSACTION_MODE,
+      (gpointer) & io_mode);
 
   GST_DEBUG_OBJECT (self, "created mpp context %p", self->mpp_ctx);
   return TRUE;
