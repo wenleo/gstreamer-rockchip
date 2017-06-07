@@ -524,6 +524,8 @@ gst_mpp_video_dec_handle_frame (GstVideoDecoder * decoder,
   if (!gst_buffer_pool_is_active (pool)) {
     GstBuffer *codec_data;
     gint block_flag = MPP_POLL_BLOCK;
+    /* at least 200 */
+    gint64 block_timeout = 200;
 
     codec_data = self->input_state->codec_data;
     if (codec_data) {
@@ -565,6 +567,8 @@ gst_mpp_video_dec_handle_frame (GstVideoDecoder * decoder,
 
     self->mpi->control (self->mpp_ctx, MPP_SET_OUTPUT_BLOCK,
         (gpointer) & block_flag);
+    self->mpi->control (self->mpp_ctx, MPP_SET_OUTPUT_BLOCK_TIMEOUT,
+        (gpointer) & block_timeout);
 
     if (gst_mpp_video_acquire_frame_format (self)) {
       GstVideoCodecState *output_state;
