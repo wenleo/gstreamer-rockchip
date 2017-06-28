@@ -5,7 +5,7 @@ dnl please read gstreamer/docs/random/autotools before changing this file
 dnl initialize autoconf
 dnl releases only do -Wall, git and prerelease does -Werror too
 dnl use a three digit version number for releases, and four for git/pre
-AC_INIT([GStreamer Plug-ins], [1.12.0], [https://github.com/rockchip-linux/gstreamer-rockchip/issues], [gstreamer-rockchip])
+AC_INIT([GStreamer Plug-ins], [1.10.0], [https://github.com/rockchip-linux/gstreamer-rockchip], [gstreamer-rockchip])
 
 AG_GST_INIT
 
@@ -46,7 +46,7 @@ AG_GST_LIBTOOL_PREPARE
 AS_LIBTOOL(GST, 801, 0, 801)
 
 dnl *** required versions of GStreamer stuff ***
-GST_REQ=1.12.0
+GST_REQ=1.10.0
 GSTPB_REQ=1.10.0
 
 dnl *** autotools stuff ****
@@ -56,6 +56,9 @@ AS_AUTOTOOLS_ALTERNATE
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I m4 -I common/m4")
+
+dnl PKG_CONFIG_SYSROOT_DIR is a valid environment variable
+m4_pattern_allow(PKG_CONFIG_SYSROOT_DIR)
 
 dnl set up gettext
 dnl the version check needs to stay here because autopoint greps for it
@@ -158,7 +161,7 @@ AC_CACHE_CHECK([for isinf], ac_cv_have_isinf,
     AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <math.h>]], [[float f = 0.0; int i=isinf(f)]])],[ac_cv_have_isinf="yes"],[ac_cv_have_isinf="no"]))
 if test "$ac_cv_have_isinf" = "yes"
 then
-    AC_DEFINE(HAVE_ISINF, 1, [Define to 1 if you have the 'isinf' function.])
+    AC_DEFINE(HAVE_ISINF, 1, [Define to 1 if you have the `isinf' function.])
 fi
 
 dnl Check for mmap (needed by electricfence plugin)
@@ -172,6 +175,7 @@ AC_CHECK_TYPE([struct ip_mreqn], [
               [#include <netinet/in.h>])
 
 dnl *** checks for dependency libraries ***
+
 
 dnl GLib
 GLIB_REQ=2.32.0
@@ -276,9 +280,7 @@ AM_CONDITIONAL(GST_PLUGIN_BUILD_STATIC, test "x$enable_static_plugins" = "xyes")
 # set by AG_GST_PARSE_SUBSYSTEM_DISABLES above
 dnl make sure it doesn't complain about unused variables if debugging is disabled
 NO_WARNINGS=""
-if test "x${GST_DISABLE_GST_DEBUG}" = "xyes"; then
-  NO_WARNINGS="-Wno-unused"
-fi
+AG_GST_CHECK_GST_DEBUG_DISABLED([NO_WARNINGS="-Wno-unused"], [NO_WARNINGS=""])
 
 dnl define an ERROR_CFLAGS Makefile variable
 dnl -Wundef: too many broken headers
@@ -314,6 +316,7 @@ dnl these are all the gst plug-ins, compilable without additional libs
 dnl of EXT plugins
 AM_CONDITIONAL(USE_ROCKCHIPMPP, false)
 AM_CONDITIONAL(USE_VPUDEC, false)
+AM_CONDITIONAL(USE_KMS, false)
 AM_CONDITIONAL(USE_RKXIMAGE, false)
 
 dnl *** finalize CFLAGS, LDFLAGS, LIBS
@@ -401,21 +404,21 @@ AG_GST_CHECK_FEATURE(RKXIMAGE, [drm/kms and x11 libraries], rkximage, [
 
 dnl keep this alphabetic per directory, please
 AC_CONFIG_FILES(
-common/m4/Makefile
-common/Makefile
-m4/Makefile
 Makefile
-gst/Makefile
-gst/rkximage/Makefile
-gst/rockchipmpp/Makefile
-gst/vpudec/Makefile
 gst-libs/Makefile
 gst-libs/gst/Makefile
 gst-libs/gst/vpudec/Makefile
+gst/Makefile
+gst/vpudec/Makefile
+gst/rockchipmpp/Makefile
+gst/rkximage/Makefile
+common/Makefile
+common/m4/Makefile
+m4/Makefile
 tests/Makefile
 tests/examples/Makefile
-tests/examples/camera/Makefile
 tests/examples/player/Makefile
+tests/examples/camera/Makefile
 )
 
 AC_OUTPUT
