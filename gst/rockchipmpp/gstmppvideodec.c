@@ -56,7 +56,8 @@ static GstStaticPadTemplate gst_mpp_video_dec_sink_template =
         "mpegversion = (int) { 1, 2, 4 },"
         "parsed = (boolean) true,"
         "systemstream = (boolean) false"
-        ";" "video/x-vp8" ";" "video/x-vp9" ";")
+        ";" "video/x-vp8" ";" "video/x-vp9" ";"
+        "image/jpeg," "parsed = (boolean) true" ";")
     );
 
 static GstStaticPadTemplate gst_mpp_video_dec_src_template =
@@ -109,6 +110,8 @@ to_mpp_codec (GstStructure * s)
     return MPP_VIDEO_CodingVP8;
   if (gst_structure_has_name (s, "video/x-vp9"))
     return MPP_VIDEO_CodingVP9;
+  if (gst_structure_has_name (s, "image/jpeg"))
+    return MPP_VIDEO_CodingMJPEG;
 
   /* add more type here */
   return MPP_VIDEO_CodingUnused;
