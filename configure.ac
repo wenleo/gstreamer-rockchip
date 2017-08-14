@@ -397,6 +397,13 @@ AG_GST_CHECK_FEATURE(VPUDEC, [rockchip vpu legacy libraries], vpudec, [
     HAVE_VPUDEC=yes, HAVE_VPUDEC=no)
 ])
 
+dnl *** kms ***
+translit(dnm, m, l) AM_CONDITIONAL(USE_KMS, true)
+AG_GST_CHECK_FEATURE(KMS, [drm/kms libraries], kms, [
+  AG_GST_PKG_CHECK_MODULES(GST_ALLOCATORS, gstreamer-allocators-1.0)
+  PKG_CHECK_MODULES([KMS_DRM], [libdrm >= 2.4.55], HAVE_KMS=yes, HAVE_KMS=no)
+])
+
 translit(dnm, m, l) AM_CONDITIONAL(USE_RKXIMAGE, true)
 AG_GST_CHECK_FEATURE(RKXIMAGE, [drm/kms and x11 libraries], rkximage, [
   PKG_CHECK_MODULES([RKXIMAGE], [x11 libdrm], HAVE_RKXIMAGE=yes, HAVE_RKXIMAGE=no)
@@ -412,6 +419,7 @@ gst/Makefile
 gst/vpudec/Makefile
 gst/rockchipmpp/Makefile
 gst/rkximage/Makefile
+gst/kms/Makefile
 common/Makefile
 common/m4/Makefile
 m4/Makefile
