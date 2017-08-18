@@ -547,6 +547,12 @@ gst_mpp_video_dec_handle_frame (GstVideoDecoder * decoder,
     self->mpi->control (self->mpp_ctx, MPP_SET_OUTPUT_BLOCK_TIMEOUT,
         (gpointer) & block_timeout);
 
+    self->first_frame = 0;
+
+    GST_VIDEO_DECODER_STREAM_LOCK (decoder);
+  }
+
+  if(!self->first_frame) {
     if (gst_mpp_video_acquire_frame_format (self)) {
       GstVideoCodecState *output_state;
       GstVideoInfo *info = &self->info;
@@ -571,10 +577,10 @@ gst_mpp_video_dec_handle_frame (GstVideoDecoder * decoder,
         goto error_activate_pool;
 
       self->mpi->control (self->mpp_ctx, MPP_DEC_SET_INFO_CHANGE_READY, NULL);
+      self->first_frame = 1;
     } else {
-      goto not_negotiated;
+      goto drop;
     }
-    GST_VIDEO_DECODER_STREAM_LOCK (decoder);
   }
 
   /* Start the output thread if it is not started before */
