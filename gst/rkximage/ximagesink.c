@@ -589,11 +589,19 @@ gst_x_image_sink_ximage_put (GstRkXImageSink * ximagesink, GstBuffer * ximage)
     result.h *= 2;
   }
 
-  pitches[0] = video_info->stride[0];
-  offsets[0] = video_info->offset[0];
+  if (video_info) {
+    pitches[0] = video_info->stride[0];
+    offsets[0] = video_info->offset[0];
+    pitches[1] = video_info->stride[1];
+    offsets[1] = video_info->offset[1];
+  } else {
+    pitches[0] = GST_VIDEO_INFO_COMP_STRIDE (&ximagesink->info, 0);
+    offsets[0] = GST_VIDEO_INFO_COMP_OFFSET (&ximagesink->info, 0);
+    pitches[1] = GST_VIDEO_INFO_COMP_STRIDE (&ximagesink->info, 1);
+    offsets[1] = GST_VIDEO_INFO_COMP_OFFSET (&ximagesink->info, 1);
+  }
+
   bo_handles[0] = gem_handle;
-  pitches[1] = video_info->stride[1];
-  offsets[1] = video_info->offset[1];
   bo_handles[1] = gem_handle;
 
   /* handle hardware limition */
