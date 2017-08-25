@@ -596,7 +596,7 @@ gst_x_image_sink_ximage_put (GstRkXImageSink * ximagesink, GstBuffer * ximage)
     offsets[1] = video_info->offset[1];
   } else {
     pitches[0] = GST_VIDEO_INFO_COMP_STRIDE (&ximagesink->info, 0);
-    offsets[0] = GST_VIDEO_INFO_COMP_OFFSET (&ximagesink->info, 0);
+    offsets[0] = 0;
     pitches[1] = GST_VIDEO_INFO_COMP_STRIDE (&ximagesink->info, 1);
     offsets[1] = GST_VIDEO_INFO_COMP_OFFSET (&ximagesink->info, 1);
   }
