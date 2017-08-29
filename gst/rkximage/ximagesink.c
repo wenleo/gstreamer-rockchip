@@ -52,9 +52,7 @@ static GstStaticPadTemplate gst_x_image_sink_sink_template_factory =
 GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK,
     GST_PAD_ALWAYS,
-    GST_STATIC_CAPS ("video/x-raw, "
-        "framerate = (fraction) [ 0, MAX ], "
-        "width = (int) [ 1, MAX ], " "height = (int) [ 1, MAX ]")
+    GST_STATIC_CAPS ("video/x-msvideo")
     );
 
 enum
@@ -2222,7 +2220,7 @@ static gboolean
 plugin_init (GstPlugin * plugin)
 {
   if (!gst_element_register (plugin, "rkximagesink",
-          GST_RANK_SECONDARY, GST_TYPE_X_IMAGE_SINK))
+          GST_RANK_PRIMARY + 1, GST_TYPE_X_IMAGE_SINK))
     return FALSE;
 
   GST_DEBUG_CATEGORY_INIT (gst_debug_x_image_sink, "rkximagesink", 0,

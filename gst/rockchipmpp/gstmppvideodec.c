@@ -66,7 +66,9 @@ static GstStaticPadTemplate gst_mpp_video_dec_src_template =
         ";"
         "video/x-raw, "
         "format = (string) P010_10LE, "
-        "width  = (int) [ 32, 4096 ], " "height =  (int) [ 32, 4096 ]" ";")
+        "width  = (int) [ 32, 4096 ], " "height =  (int) [ 32, 4096 ]"
+        ";"
+        "video/x-msvideo" ";")
     );
 
 static MppCodingType
