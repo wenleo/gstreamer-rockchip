@@ -366,13 +366,17 @@ gst_mpp_video_enc_process_buffer (GstMppVideoEnc * self, GstBuffer * buffer)
       if (packet) {
         gconstpointer *ptr = mpp_packet_get_pos (packet);
         gsize len = mpp_packet_get_length (packet);
+        gsize sps_len = 0;
 
         if (mpp_packet_get_eos (packet))
           ret = GST_FLOW_EOS;
 
+        if (!sps_flag)
+          sps_len = mpp_packet_get_length (sps_packet);
+
         GST_LOG_OBJECT (self, "Allocate output buffer");
         new_buffer = gst_video_encoder_allocate_output_buffer (encoder,
-            MAX_CODEC_FRAME + len);
+            sps_len + len);
         if (NULL == new_buffer) {
           ret = GST_FLOW_FLUSHING;
           goto beach;
@@ -383,7 +387,7 @@ gst_mpp_video_enc_process_buffer (GstMppVideoEnc * self, GstBuffer * buffer)
           gst_buffer_fill (new_buffer, 0, ptr, len);
         } else {
           const gpointer *sps_ptr = mpp_packet_get_pos (sps_packet);
-          gsize sps_len = mpp_packet_get_length (sps_packet);
+          sps_len = mpp_packet_get_length (sps_packet);
           gst_buffer_fill (new_buffer, 0, sps_ptr, sps_len);
           gst_buffer_fill (new_buffer, sps_len, ptr, len);
           sps_flag = 1;
