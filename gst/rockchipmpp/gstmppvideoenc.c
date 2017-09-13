@@ -309,6 +309,13 @@ gst_mpp_video_enc_process_buffer (GstMppVideoEnc * self, GstBuffer * buffer)
   static gint sps_flag = 0;
   MppPacket sps_packet = NULL;
 
+  if (!sps_flag) {
+    if (self->mpi->control (self->mpp_ctx, MPP_ENC_GET_EXTRA_INFO, &sps_packet)) {
+      GST_ERROR_OBJECT (self, "Get Mpp extra data failed\n");
+      return GST_FLOW_ERROR;
+    }
+  }
+
   /* Eos buffer */
   mpp_frame_set_buffer (mpp_frame, frame_in);
   if (0 == gst_buffer_get_size (buffer)) {
@@ -375,20 +382,11 @@ gst_mpp_video_enc_process_buffer (GstMppVideoEnc * self, GstBuffer * buffer)
         if (sps_flag) {
           gst_buffer_fill (new_buffer, 0, ptr, len);
         } else {
-          if (!self->mpi->control (self->mpp_ctx, MPP_ENC_GET_EXTRA_INFO,
-                  &sps_packet)) {
-            const gpointer *sps_ptr = mpp_packet_get_pos (sps_packet);
-            gsize sps_len = mpp_packet_get_length (sps_packet);
-
-            gst_buffer_fill (new_buffer, 0, sps_ptr, sps_len);
-
-            gst_buffer_fill (new_buffer, sps_len, ptr, len);
-            sps_flag = 1;
-
-          } else {
-            GST_ERROR_OBJECT (self, "Get Mpp extra data failed\n");
-            return GST_FLOW_ERROR;
-          }
+          const gpointer *sps_ptr = mpp_packet_get_pos (sps_packet);
+          gsize sps_len = mpp_packet_get_length (sps_packet);
+          gst_buffer_fill (new_buffer, 0, sps_ptr, sps_len);
+          gst_buffer_fill (new_buffer, sps_len, ptr, len);
+          sps_flag = 1;
         }
 
         mpp_packet_deinit (&packet);
